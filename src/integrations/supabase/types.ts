@@ -14,7 +14,135 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bonuses: {
+        Row: {
+          bet: number
+          buyin: number
+          created_at: string
+          hunt_id: string
+          id: string
+          sequence: number
+          slot_id: string | null
+          slot_name: string
+          updated_at: string
+          win: number
+        }
+        Insert: {
+          bet?: number
+          buyin?: number
+          created_at?: string
+          hunt_id: string
+          id?: string
+          sequence?: number
+          slot_id?: string | null
+          slot_name: string
+          updated_at?: string
+          win?: number
+        }
+        Update: {
+          bet?: number
+          buyin?: number
+          created_at?: string
+          hunt_id?: string
+          id?: string
+          sequence?: number
+          slot_id?: string | null
+          slot_name?: string
+          updated_at?: string
+          win?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bonuses_hunt_id_fkey"
+            columns: ["hunt_id"]
+            isOneToOne: false
+            referencedRelation: "hunts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bonuses_slot_id_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hunts: {
+        Row: {
+          big_win_alerts: boolean
+          channel: string
+          created_at: string
+          ended_at: string | null
+          id: string
+          name: string
+          number: number
+          overlay_position: string
+          show_last_bonus: boolean
+          started_at: string | null
+          status: string
+          target_bonuses: number | null
+        }
+        Insert: {
+          big_win_alerts?: boolean
+          channel?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          name?: string
+          number?: number
+          overlay_position?: string
+          show_last_bonus?: boolean
+          started_at?: string | null
+          status?: string
+          target_bonuses?: number | null
+        }
+        Update: {
+          big_win_alerts?: boolean
+          channel?: string
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          name?: string
+          number?: number
+          overlay_position?: string
+          show_last_bonus?: boolean
+          started_at?: string | null
+          status?: string
+          target_bonuses?: number | null
+        }
+        Relationships: []
+      }
+      slots: {
+        Row: {
+          created_at: string
+          default_bet: number | null
+          default_buyin: number | null
+          icon_url: string | null
+          id: string
+          name: string
+          provider: string | null
+        }
+        Insert: {
+          created_at?: string
+          default_bet?: number | null
+          default_buyin?: number | null
+          icon_url?: string | null
+          id?: string
+          name: string
+          provider?: string | null
+        }
+        Update: {
+          created_at?: string
+          default_bet?: number | null
+          default_buyin?: number | null
+          icon_url?: string | null
+          id?: string
+          name?: string
+          provider?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
