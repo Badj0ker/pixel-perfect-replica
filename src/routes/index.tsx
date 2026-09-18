@@ -18,6 +18,7 @@ import {
   type Bonus,
   type Hunt,
   type Slot,
+  type OverlayPosition,
 } from "@/lib/bonus-hunt";
 
 import { Button } from "@/components/ui/button";
@@ -118,12 +119,15 @@ function AdminPage() {
     const { error } = await supabase
       .from("hunts")
       .insert({ channel: CHANNEL, name: "Bonus Hunt", status: "draft", target_bonuses: 50 });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("New hunt created");
     await refresh();
   };
 
-  const patchHunt = async (patch: Record<string, unknown>) => {
+  const patchHunt = async (patch: Partial<Hunt>) => {
     if (!hunt) return;
     const { error } = await supabase.from("hunts").update(patch).eq("id", hunt.id);
     if (error) toast.error(error.message);
@@ -156,8 +160,14 @@ function AdminPage() {
   };
 
   const addBonus = async () => {
-    if (!hunt) return toast.error("Create a hunt first");
-    if (!selectedSlot) return toast.error("Pick a slot");
+    if (!hunt) {
+      toast.error("Create a hunt first");
+      return;
+    }
+    if (!selectedSlot) {
+      toast.error("Pick a slot");
+      return;
+    }
     const nextSeq = bonuses.length ? Math.max(...bonuses.map((b) => b.sequence)) + 1 : 1;
     const { error } = await supabase.from("bonuses").insert({
       hunt_id: hunt.id,
@@ -168,7 +178,10 @@ function AdminPage() {
       bet: Number(bet) || 0,
       win: Number(win) || 0,
     });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setWin("");
     toast.success(`#${nextSeq} ${selectedSlot.name} added`);
   };
@@ -180,7 +193,10 @@ function AdminPage() {
       .insert({ name: newSlotName.trim(), provider: newSlotProvider.trim() || null })
       .select()
       .single();
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setNewSlotName("");
     setNewSlotProvider("");
     await loadSlots();
@@ -211,7 +227,10 @@ function AdminPage() {
         win: Number(draft.win) || 0,
       })
       .eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setEditing(null);
   };
 
@@ -219,6 +238,11 @@ function AdminPage() {
     const { error } = await supabase.from("bonuses").delete().eq("id", id);
     if (error) toast.error(error.message);
   };
+
+  const [targetDraft, setTargetDraft] = useState("");
+  useEffect(() => {
+    setTargetDraft(hunt?.target_bonuses != null ? String(hunt.target_bonuses) : "");
+  }, [hunt?.id, hunt?.target_bonuses]);
 
   const status = hunt?.status ?? "draft";
 
@@ -284,12 +308,16 @@ function AdminPage() {
                     <Input
                       className="mt-2"
                       type="number"
-                      value={hunt.target_bonuses ?? ""}
-                      onChange={(e) =>
+                      value={targetDraft}
+                      onChange={(e) => setTargetDraft(e.target.value)}
+                      onBlur={() =>
                         void patchHunt({
-                          target_bonuses: e.target.value ? Number(e.target.value) : null,
+                          target_bonuses: targetDraft ? Number(targetDraft) : null,
                         })
                       }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") e.currentTarget.blur();
+                      }}
                     />
                   </div>
                   <div>
@@ -564,7 +592,9 @@ function AdminPage() {
                   <Label className="stat-label">Panel position</Label>
                   <Select
                     value={hunt?.overlay_position ?? "right-center"}
-                    onValueChange={(v) => void patchHunt({ overlay_position: v })}
+                    onValueChange={(v) =>
+                      void patchHunt({ overlay_position: v as OverlayPosition })
+                    }
                   >
                     <SelectTrigger className="mt-2">
                       <SelectValue />
@@ -600,12 +630,11 @@ function AdminPage() {
             </Panel>
 
             <Panel title="Live preview">
-              <div className="relative h-[720px] overflow-hidden rounded-xl border border-border bg-[repeating-conic-gradient(oklch(0.24_0.006_264)_0%_25%,oklch(0.2_0.006_264)_0%_50%)] bg-[length:28px_28px]">
-                <div
-                  className="absolute top-6 left-1/2 origin-top -translate-x-1/2"
-                  style={{ transform: "translateX(-50%) scale(0.92)" }}
-                >
-                  <OverlayPanel hunt={hunt} bonuses={bonuses} />
+              <div className="relative h-[620px] overflow-hidden rounded-xl border border-border bg-[repeating-conic-gradient(oklch(0.24_0.006_264)_0%_25%,oklch(0.2_0.006_264)_0%_50%)] bg-[length:28px_28px]">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="origin-center scale-[0.88]">
+                    <OverlayPanel hunt={hunt} bonuses={bonuses} />
+                  </div>
                 </div>
               </div>
             </Panel>
