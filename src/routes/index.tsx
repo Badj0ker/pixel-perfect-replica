@@ -220,6 +220,11 @@ function AdminPage() {
     if (error) toast.error(error.message);
   };
 
+  const [targetDraft, setTargetDraft] = useState("");
+  useEffect(() => {
+    setTargetDraft(hunt?.target_bonuses != null ? String(hunt.target_bonuses) : "");
+  }, [hunt?.id, hunt?.target_bonuses]);
+
   const status = hunt?.status ?? "draft";
 
   return (
