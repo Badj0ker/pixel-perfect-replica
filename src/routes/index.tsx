@@ -284,12 +284,16 @@ function AdminPage() {
                     <Input
                       className="mt-2"
                       type="number"
-                      value={hunt.target_bonuses ?? ""}
-                      onChange={(e) =>
+                      value={targetDraft}
+                      onChange={(e) => setTargetDraft(e.target.value)}
+                      onBlur={() =>
                         void patchHunt({
-                          target_bonuses: e.target.value ? Number(e.target.value) : null,
+                          target_bonuses: targetDraft ? Number(targetDraft) : null,
                         })
                       }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") e.currentTarget.blur();
+                      }}
                     />
                   </div>
                   <div>
@@ -600,12 +604,11 @@ function AdminPage() {
             </Panel>
 
             <Panel title="Live preview">
-              <div className="relative h-[720px] overflow-hidden rounded-xl border border-border bg-[repeating-conic-gradient(oklch(0.24_0.006_264)_0%_25%,oklch(0.2_0.006_264)_0%_50%)] bg-[length:28px_28px]">
-                <div
-                  className="absolute top-6 left-1/2 origin-top -translate-x-1/2"
-                  style={{ transform: "translateX(-50%) scale(0.92)" }}
-                >
-                  <OverlayPanel hunt={hunt} bonuses={bonuses} />
+              <div className="relative h-[620px] overflow-hidden rounded-xl border border-border bg-[repeating-conic-gradient(oklch(0.24_0.006_264)_0%_25%,oklch(0.2_0.006_264)_0%_50%)] bg-[length:28px_28px]">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="origin-center scale-[0.88]">
+                    <OverlayPanel hunt={hunt} bonuses={bonuses} />
+                  </div>
                 </div>
               </div>
             </Panel>
