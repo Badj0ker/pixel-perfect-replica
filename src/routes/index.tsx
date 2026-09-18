@@ -18,6 +18,7 @@ import {
   type Bonus,
   type Hunt,
   type Slot,
+  type OverlayPosition,
 } from "@/lib/bonus-hunt";
 
 import { Button } from "@/components/ui/button";
@@ -591,7 +592,9 @@ function AdminPage() {
                   <Label className="stat-label">Panel position</Label>
                   <Select
                     value={hunt?.overlay_position ?? "right-center"}
-                    onValueChange={(v) => void patchHunt({ overlay_position: v })}
+                    onValueChange={(v) =>
+                      void patchHunt({ overlay_position: v as OverlayPosition })
+                    }
                   >
                     <SelectTrigger className="mt-2">
                       <SelectValue />
