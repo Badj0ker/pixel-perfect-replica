@@ -118,12 +118,15 @@ function AdminPage() {
     const { error } = await supabase
       .from("hunts")
       .insert({ channel: CHANNEL, name: "Bonus Hunt", status: "draft", target_bonuses: 50 });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("New hunt created");
     await refresh();
   };
 
-  const patchHunt = async (patch: Record<string, unknown>) => {
+  const patchHunt = async (patch: Partial<Hunt>) => {
     if (!hunt) return;
     const { error } = await supabase.from("hunts").update(patch).eq("id", hunt.id);
     if (error) toast.error(error.message);
@@ -156,8 +159,14 @@ function AdminPage() {
   };
 
   const addBonus = async () => {
-    if (!hunt) return toast.error("Create a hunt first");
-    if (!selectedSlot) return toast.error("Pick a slot");
+    if (!hunt) {
+      toast.error("Create a hunt first");
+      return;
+    }
+    if (!selectedSlot) {
+      toast.error("Pick a slot");
+      return;
+    }
     const nextSeq = bonuses.length ? Math.max(...bonuses.map((b) => b.sequence)) + 1 : 1;
     const { error } = await supabase.from("bonuses").insert({
       hunt_id: hunt.id,
@@ -168,7 +177,10 @@ function AdminPage() {
       bet: Number(bet) || 0,
       win: Number(win) || 0,
     });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setWin("");
     toast.success(`#${nextSeq} ${selectedSlot.name} added`);
   };
@@ -180,7 +192,10 @@ function AdminPage() {
       .insert({ name: newSlotName.trim(), provider: newSlotProvider.trim() || null })
       .select()
       .single();
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setNewSlotName("");
     setNewSlotProvider("");
     await loadSlots();
@@ -211,7 +226,10 @@ function AdminPage() {
         win: Number(draft.win) || 0,
       })
       .eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setEditing(null);
   };
 

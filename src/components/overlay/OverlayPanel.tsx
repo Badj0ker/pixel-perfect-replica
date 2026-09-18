@@ -65,7 +65,7 @@ export function OverlayPanel({ hunt, bonuses }: { hunt: Hunt | null; bonuses: Bo
     if (firstPass.current) {
       firstPass.current = false;
       seen.current = id;
-      return;
+      return () => {};
     }
     if (id && id !== seen.current) {
       seen.current = id;
@@ -73,6 +73,7 @@ export function OverlayPanel({ hunt, bonuses }: { hunt: Hunt | null; bonuses: Bo
       const t = window.setTimeout(() => setHero(null), 3000);
       return () => window.clearTimeout(t);
     }
+    return () => {};
   }, [last]);
 
   const heroX = hero ? multiplierOf(hero) : 0;
